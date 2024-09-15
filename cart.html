@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Organic Hemp Products</title>
+    <link rel="stylesheet" href="cart.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="images/whitelogo.png" alt="logo" height="100px">
+        </div>
+
+        <div class="center">
+        <nav>
+            <ul>
+                <li><a href="hemp.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        </div>
+
+        <div class="cart-icon"> 
+            <img src="images/cart.png" height="30px"><span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <main>
+        <section id="cart-page">
+            <h2>Your Cart</h2>
+            <div id="cart-items"></div>
+            <br>
+            <div id="cart-total">Total: ₹<span id="price">0.00</span></div>
+            <br><br>
+            <button id="checkout-btn">Checkout</button>
+            <button id="clear-cart-btn">Clear Cart</button>
+        </section>
+        <div>
+            <h3>EcoCoins: <span id="coinsCount">0</span></h3>
+        </div>
+    </main>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let cartCount = cart.length;
+
+        function updateCartPage() {
+            const cartItems = document.getElementById('cart-items');
+            const priceElement = document.getElementById('price');
+            let total = 0;
+            
+            cartItems.innerHTML = '';
+            cart.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('cart-item');
+                itemElement.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>₹${item.price.toFixed(2)}</span>
+                    <button onclick="removeFromCart(${index})">Remove</button>
+                `;
+                cartItems.appendChild(itemElement);
+                total += item.price;
+            });
+            priceElement.textContent = total.toFixed(2);
+            updateCartIcon();
+        }
+
+        function calEcoCoins(){
+            let ecoCoins = 0;
+            const cartTotalElement = document.getElementById('price');4
+            if (cartTotalElement && cartTotalElement.textContent) {
+                const cartTotal = parseFloat(cartTotalElement.textContent);
+                if (!isNaN(cartTotal)) {
+                    ecoCoins = Math.floor(cartTotal / 50); 
+                }
+            } else {
+                console.error("Cart total element is missing or empty.");
+            }
+
+            document.getElementById('coinsCount').innerText = ecoCoins;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            cartCount--;
+            updateCartPage();
+            saveCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            cartCount = 0;
+            updateCartPage();
+            saveCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function updateCartIcon() {
+            document.getElementById('cart-count').textContent = cartCount;
+        }
+
+        document.getElementById('checkout-btn').addEventListener('click', function() {
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+            } else {
+                alert('Order placed successfully!');
+                calEcoCoins();
+                clearCart();
+            }
+        });
+
+        document.getElementById('clear-cart-btn').addEventListener('click', function() {
+            clearCart();
+            alert('Cart cleared');
+        });
+
+        updateCartPage();
+    </script>
+</body>
+</html>
